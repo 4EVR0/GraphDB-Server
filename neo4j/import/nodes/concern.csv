@@ -1,0 +1,16 @@
+concern_code:ID(Concern),concern_name_ko
+ACNE,여드름
+COMEDONES,면포
+OILY_SKIN,지성 피부
+SENSITIVE_SKIN,민감성 피부
+REDNESS,붉은기
+IRRITATED_SKIN,자극 피부
+DRY_SKIN,건성 피부
+DEHYDRATED_SKIN,수분 부족 피부
+BARRIER_DAMAGE,피부 장벽 손상
+HYPERPIGMENTATION,색소침착
+DULLNESS,피부 톤 저하
+AGING_SIGNS,노화 징후
+ATOPIC_PRONE,아토피 피부 경향
+ROSACEA_PRONE,주사 피부 경향
+POST_ACNE_MARKS,여드름 자국
