@@ -3,3 +3,5 @@ csv/
 neo4j/data/
 neo4j/logs/
 neo4j/plugins/
+neo4j/import/
+venv/
