@@ -11,7 +11,6 @@ services:
       NEO4J_dbms_security_procedures_unrestricted: apoc.*
       NEO4J_server_memory_heap_initial__size: 1g
       NEO4J_server_memory_heap_max__size: 2g
-하
     volumes:
       - ./neo4j/data:/data
       - ./neo4j/logs:/logs
