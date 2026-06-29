@@ -12,21 +12,32 @@ import math
 
 from gold_labels import PRODUCTION_CONCERN_EFFECT_MAP, fetch_all_affects, get_driver
 
-# app/clients/neo4j_client.py query_ingredients_by_effects 그대로 복제 (2026-06-24 기준)
+# app/clients/neo4j_client.py query_ingredients_by_effects 그대로 복제 (2026-06-29 dedup 수정)
+# 변경 이유: RETURN DISTINCT가 (이름, claim, evidence_type, ...) 행 전체 기준으로 동작해
+# 한 성분이 여러 effect로 매치되면 LIMIT 20 슬롯을 중복으로 차지하는 문제를 수정.
+# head(collect())로 성분당 최강 근거 1건만 남겨 LIMIT 20 = distinct 성분 20개를 보장한다.
 INGREDIENTS_BY_EFFECTS_QUERY = """
 UNWIND $effects AS effect_code
 MATCH (i:Ingredient)-[r:AFFECTS]->(e:Effect {effect_code: effect_code})
-RETURN DISTINCT
-    i.inci_name        AS name,
-    i.kor_name         AS kor_name,
-    e.effect_name_en   AS claim,
-    r.evidence_type    AS eligibility_tier,
-    toString(r.paper_count) AS paper_ref,
-    r.graph_score      AS graph_score
-ORDER BY
-    CASE r.evidence_type WHEN 'pubmed_evidence' THEN 0 ELSE 1 END,
-    r.graph_score DESC,
-    i.inci_name
+WITH i, e, r,
+     CASE r.evidence_type WHEN 'pubmed_evidence' THEN 0 ELSE 1 END AS ev_rank
+ORDER BY ev_rank, r.graph_score DESC
+WITH i,
+     head(collect({
+         claim:            e.effect_name_en,
+         eligibility_tier: r.evidence_type,
+         paper_ref:        toString(r.paper_count),
+         graph_score:      r.graph_score,
+         ev_rank:          ev_rank
+     })) AS best
+RETURN
+    i.inci_name           AS name,
+    i.kor_name            AS kor_name,
+    best.claim            AS claim,
+    best.eligibility_tier AS eligibility_tier,
+    best.paper_ref        AS paper_ref,
+    best.graph_score      AS graph_score
+ORDER BY best.ev_rank, best.graph_score DESC, i.inci_name
 LIMIT 20
 """
 
