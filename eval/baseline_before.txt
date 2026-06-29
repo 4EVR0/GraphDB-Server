@@ -1,0 +1,36 @@
+# 주의: 이 파일은 2026-06-24 RESULTS.md 수치를 스크립트 출력 형식으로 재구성한 것.
+# 실제 측정 시점: 2026-06-24 (dedup 수정 전 운영 쿼리 기준)
+# 재구성 시점: 2026-06-29 (수정 후 실제 실행 불가 — 쿼리 이미 변경됨)
+
+=== concern별 경로 탐색 결과 ===
+concern                cand  gold  ing distinct prod    P@K    R@K   NDCG
+ACNE                    280     5   20       19    5   0.25   1.00   1.00 <-- 중복 성분 있음
+COMEDONES               164     2   20       20    5   0.10   1.00   1.00
+PORE_CONGESTION         164     2   20       20    5   0.10   1.00   1.00
+ENLARGED_PORES          164     2   20       20    5   0.10   1.00   1.00
+OILY_SKIN               198     5   20       20    5   0.25   1.00   1.00
+SENSITIVE_SKIN         4009    84   20       14    5   1.00   0.24   1.00 <-- 중복 성분 있음
+REDNESS                 277    28   20       19    5   1.00   0.71   1.00 <-- 중복 성분 있음
+IRRITATED_SKIN         2157    59   20       15    5   1.00   0.34   1.00 <-- 중복 성분 있음
+ATOPIC_PRONE           4009    84   20       14    5   1.00   0.24   1.00 <-- 중복 성분 있음
+ROSACEA_PRONE           277    28   20       19    5   1.00   0.71   1.00 <-- 중복 성분 있음
+DRY_SKIN               3963    60   20       17    5   1.00   0.33   1.00 <-- 중복 성분 있음
+DEHYDRATED_SKIN        2083    29   20       17    5   1.00   0.69   1.00 <-- 중복 성분 있음
+FLAKY_SKIN             2090    29   20       17    5   1.00   0.69   1.00 <-- 중복 성분 있음
+ROUGH_TEXTURE           238     4   20       20    5   0.20   1.00   1.00
+BARRIER_DAMAGE         4199    85   20       14    5   1.00   0.24   1.00 <-- 중복 성분 있음
+HYPERPIGMENTATION        56    18   20       18    5   0.90   1.00   1.00 <-- 중복 성분 있음
+DULLNESS                212     0   20       20    5   0.00      -   0.00
+UNEVEN_SKIN_TONE         15    15   15       13    5   1.00   1.00   1.00 <-- 중복 성분 있음
+BLEMISHES                17    17   17       15    5   1.00   1.00   1.00 <-- 중복 성분 있음
+POST_ACNE_MARKS          17    17   17       15    5   1.00   1.00   1.00 <-- 중복 성분 있음
+DARK_CIRCLES             15    15   15       13    5   1.00   1.00   1.00 <-- 중복 성분 있음
+SUNBURN                 452    36   20       19    5   1.00   0.56   1.00 <-- 중복 성분 있음
+AGING_SIGNS             423    15   20       15    5   0.70   0.93   1.00 <-- 중복 성분 있음
+WRINKLES               2070    40   20       17    5   1.00   0.50   1.00 <-- 중복 성분 있음
+LOSS_OF_ELASTICITY      449    19   20       18    5   0.90   0.95   1.00 <-- 중복 성분 있음
+SAGGING_SKIN            218    15   20       18    5   0.70   0.93   1.00 <-- 중복 성분 있음
+
+성분 0건 concern: 0/26 -> []
+성분은 있지만 제품 0건 concern: 0 -> []
+top-20 안에 중복 성분 있는 concern: 20/26 -> ['ACNE', 'SENSITIVE_SKIN', 'REDNESS', 'IRRITATED_SKIN', 'ATOPIC_PRONE', 'ROSACEA_PRONE', 'DRY_SKIN', 'DEHYDRATED_SKIN', 'FLAKY_SKIN', 'BARRIER_DAMAGE', 'HYPERPIGMENTATION', 'UNEVEN_SKIN_TONE', 'BLEMISHES', 'POST_ACNE_MARKS', 'DARK_CIRCLES', 'SUNBURN', 'AGING_SIGNS', 'WRINKLES', 'LOSS_OF_ELASTICITY', 'SAGGING_SKIN']

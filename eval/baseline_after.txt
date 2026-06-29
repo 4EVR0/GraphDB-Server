@@ -1,0 +1,32 @@
+=== concern별 경로 탐색 결과 ===
+concern               cand  gold  ing distinct prod    P@K    R@K   NDCG
+ACNE                   280     5   20       20    5   0.25   1.00   1.00
+COMEDONES              164     2   20       20    5   0.10   1.00   1.00
+PORE_CONGESTION        164     2   20       20    5   0.10   1.00   1.00
+ENLARGED_PORES         164     2   20       20    5   0.10   1.00   1.00
+OILY_SKIN              198     5   20       20    5   0.25   1.00   1.00
+SENSITIVE_SKIN        4009    84   20       20    5   1.00   0.24   1.00
+REDNESS                277    28   20       20    5   1.00   0.71   1.00
+IRRITATED_SKIN        2157    59   20       20    5   1.00   0.34   1.00
+ATOPIC_PRONE          4009    84   20       20    5   1.00   0.24   1.00
+ROSACEA_PRONE          277    28   20       20    5   1.00   0.71   1.00
+DRY_SKIN              3963    60   20       20    5   1.00   0.33   1.00
+DEHYDRATED_SKIN       2083    29   20       20    5   1.00   0.69   1.00
+FLAKY_SKIN            2090    29   20       20    5   1.00   0.69   1.00
+ROUGH_TEXTURE          238     4   20       20    5   0.20   1.00   1.00
+BARRIER_DAMAGE        4199    85   20       20    5   1.00   0.24   1.00
+HYPERPIGMENTATION       56    18   20       20    5   0.80   0.89   1.00
+DULLNESS               212     0   20       20    5   0.00      -   0.00
+UNEVEN_SKIN_TONE        15    15   13       13    5   1.00   0.87   1.00
+BLEMISHES               17    17   15       15    5   1.00   0.88   1.00
+POST_ACNE_MARKS         17    17   15       15    5   1.00   0.88   1.00
+DARK_CIRCLES            15    15   13       13    5   1.00   0.87   1.00
+SUNBURN                452    36   20       20    5   1.00   0.56   1.00
+AGING_SIGNS            423    15   20       20    5   0.60   0.80   1.00
+WRINKLES              2070    40   20       20    5   1.00   0.50   1.00
+LOSS_OF_ELASTICITY     449    19   20       20    5   0.80   0.84   1.00
+SAGGING_SKIN           218    15   20       20    5   0.60   0.80   1.00
+
+성분 0건 concern: 0/26 -> []
+성분은 있지만 제품 0건 concern: 0 -> []
+top-20 안에 중복 성분 있는 concern: 0/26 -> []
