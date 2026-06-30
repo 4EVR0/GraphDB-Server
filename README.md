@@ -35,9 +35,21 @@ cp .env.example .env
 # Neo4j 컨테이너 실행
 docker compose up -d
 
-# S3에서 CSV 받아서 import까지 한 번에
+# S3에서 CSV 받아서 import까지 한 번에 (배치 미지정 시 최신 자동 선택)
 bash load.sh
+
+# 특정 gold 배치 지정 (batch_job= 접두사는 생략 가능)
+bash load.sh 20260511_174455
+
+# product / contains 버전까지 명시
+bash load.sh 20260511_174455 oliveyoung_neo4j_20260510_063644 oliveyoung_neo4j_20260512_133725
+
+# 환경변수로도 지정 가능
+BATCH_JOB=20260511_174455 bash load.sh
 ```
+
+배치/버전을 지정하지 않으면 각 S3 경로에서 이름 정렬 기준 최신 배치를 자동 선택합니다.
+적재 직전 노드/엣지 카운트를 로그로 남기며, `validate.py` 통과가 import 전제 조건입니다.
 
 브라우저: `http://localhost:7474`
 
