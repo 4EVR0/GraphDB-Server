@@ -5,9 +5,9 @@ CSV_DIR="/home/graphdb/csv"
 IMPORT_DIR="/home/graphdb/neo4j/import"
 
 # S3 경로 (파일별로 따로 관리)
-S3_BATCH="s3://oliveyoung-crawl-data/graph_gold_csvs/batch_job=20260511_174455"
-S3_PRODUCT="s3://oliveyoung-crawl-data/gold/neo4j/oliveyoung/nodes/Product/oliveyoung_neo4j_20260510_063644/part-00000.csv"
-S3_CONTAINS="s3://oliveyoung-crawl-data/gold/neo4j/oliveyoung/rels/CONTAINS/oliveyoung_neo4j_20260512_133725/part-00000.csv"
+S3_BATCH="s3://oliveyoung-crawl-data/graph_gold_csvs/batch_job=20260701_003326"
+S3_PRODUCT_DIR="s3://oliveyoung-crawl-data/gold/neo4j/oliveyoung/nodes/Product/oliveyoung_neo4j_20260707_104204"
+S3_CONTAINS_DIR="s3://oliveyoung-crawl-data/gold/neo4j/oliveyoung/rels/CONTAINS/oliveyoung_neo4j_20260707_104206"
 
 echo "=== [1/4] S3에서 CSV 다운로드 ==="
 
@@ -18,22 +18,24 @@ aws s3 sync "$S3_BATCH/nodes/" "$CSV_DIR/nodes/" \
 aws s3 sync "$S3_BATCH/edges/" "$CSV_DIR/edges/" \
   --exclude "contains.csv"
 
-# product.csv (별도 경로 + 헤더 추가)
+# product.csv (별도 경로, S3의 header.csv + part-00000.csv 결합)
 echo "product.csv 다운로드..."
-aws s3 cp "$S3_PRODUCT" /tmp/product_raw.csv
-{ echo "product_id:ID(Product),product_name,brand,category"; cat /tmp/product_raw.csv; } > "$CSV_DIR/nodes/product.csv"
+aws s3 cp "$S3_PRODUCT_DIR/header.csv" /tmp/product_header.csv
+aws s3 cp "$S3_PRODUCT_DIR/part-00000.csv" /tmp/product_raw.csv
+printf '%s\n' "$(cat /tmp/product_header.csv)" | cat - /tmp/product_raw.csv > "$CSV_DIR/nodes/product.csv"
 
-# contains.csv (별도 경로 + 헤더 추가)
+# contains.csv (별도 경로, S3의 header.csv + part-00000.csv 결합)
 echo "contains.csv 다운로드..."
-aws s3 cp "$S3_CONTAINS" /tmp/contains_raw.csv
-{ echo ":START_ID(Product),:END_ID(Ingredient)"; cat /tmp/contains_raw.csv; } > "$CSV_DIR/edges/contains.csv"
+aws s3 cp "$S3_CONTAINS_DIR/header.csv" /tmp/contains_header.csv
+aws s3 cp "$S3_CONTAINS_DIR/part-00000.csv" /tmp/contains_raw.csv
+printf '%s\n' "$(cat /tmp/contains_header.csv)" | cat - /tmp/contains_raw.csv > "$CSV_DIR/edges/contains.csv"
 
 echo "다운로드 완료:"
 find "$CSV_DIR" -name "*.csv" | sort
 
 echo ""
 echo "=== [2/4] ID 검증 ==="
-python3 /home/graphdb/validate.py
+python3 /home/graphdb/validate.py /home/graphdb/csv
 echo ""
 
 echo "=== [3/4] import 디렉토리로 복사 ==="
