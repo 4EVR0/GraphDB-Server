@@ -46,8 +46,15 @@ Neo4j의 property graph를 복사하는 게 아니라, 같은 개체·관계 모
       `affects.effect_code`) 기준 인덱스 포함
 - [x] `pg_experiment/docker-compose.yml` 작성 — 5433 포트로 별도 Postgres 컨테이너
       (4EVR0-Server의 Postgres(5432, 세션 저장용)와 분리, 데이터도 독립)
-- [ ] Postgres 컨테이너 기동 및 스키마 적용
-- [ ] CSV → Postgres 적재 스크립트 작성/실행
+- [x] Postgres 컨테이너 기동 및 스키마 적용
+- [x] CSV → Postgres 적재 스크립트 작성/실행
+      (product 3122 / ingredient 3221 / effect 15 / concern 15 /
+      contains 112966 / affects 5386 / relates_to 24 — Neo4j import 원본과 동일)
+  - 적재 중 `affects.csv`에서 (inci_name, effect_code) 중복 58쌍 발견 →
+    Neo4j는 멀티그래프라 같은 두 노드 사이 관계가 여러 개 있을 수 있음.
+    PK를 (inci_name, effect_code)로 걸면 이 행들이 유실되어 Postgres가
+    실제보다 적은 데이터로 조인하게 됨 → `affects` PK를 BIGSERIAL로 변경,
+    전체 행 유지 (schema.sql 수정, 커밋 2082434)
 - [ ] Cypher 쿼리 3종 → SQL 포팅
 - [ ] 벤치마크 하네스 작성 (반복 실행, p50/p95/p99, hop 수 확장 시나리오)
 - [ ] 벤치마크 실행 및 결과 정리
