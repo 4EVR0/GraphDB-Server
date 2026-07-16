@@ -1,0 +1,87 @@
+{
+  "warmup": 20,
+  "iterations": 200,
+  "seed": 42,
+  "results": {
+    "products_by_ingredients": {
+      "neo4j": {
+        "n": 200,
+        "mean_ms": 13.716,
+        "p50_ms": 12.861,
+        "p95_ms": 17.818,
+        "p99_ms": 23.432,
+        "min_ms": 10.525,
+        "max_ms": 44.21
+      },
+      "postgres": {
+        "n": 200,
+        "mean_ms": 3.806,
+        "p50_ms": 1.992,
+        "p95_ms": 8.553,
+        "p99_ms": 30.526,
+        "min_ms": 0.949,
+        "max_ms": 92.555
+      }
+    },
+    "ingredients_by_effects": {
+      "neo4j": {
+        "n": 200,
+        "mean_ms": 10.533,
+        "p50_ms": 7.299,
+        "p95_ms": 21.322,
+        "p99_ms": 29.485,
+        "min_ms": 3.99,
+        "max_ms": 51.012
+      },
+      "postgres": {
+        "n": 200,
+        "mean_ms": 7.229,
+        "p50_ms": 3.897,
+        "p95_ms": 17.844,
+        "p99_ms": 20.968,
+        "min_ms": 0.984,
+        "max_ms": 22.026
+      }
+    },
+    "path_by_effects": {
+      "neo4j": {
+        "n": 200,
+        "mean_ms": 36.391,
+        "p50_ms": 25.086,
+        "p95_ms": 70.702,
+        "p99_ms": 96.088,
+        "min_ms": 5.578,
+        "max_ms": 109.467
+      },
+      "postgres": {
+        "n": 200,
+        "mean_ms": 54.216,
+        "p50_ms": 49.82,
+        "p95_ms": 89.997,
+        "p99_ms": 116.116,
+        "min_ms": 6.861,
+        "max_ms": 118.414
+      }
+    },
+    "products_by_concern": {
+      "neo4j": {
+        "n": 200,
+        "mean_ms": 3.448,
+        "p50_ms": 3.281,
+        "p95_ms": 4.884,
+        "p99_ms": 5.848,
+        "min_ms": 2.48,
+        "max_ms": 6.759
+      },
+      "postgres": {
+        "n": 200,
+        "mean_ms": 92.82,
+        "p50_ms": 18.537,
+        "p95_ms": 234.146,
+        "p99_ms": 247.685,
+        "min_ms": 6.418,
+        "max_ms": 254.962
+      }
+    }
+  }
+}

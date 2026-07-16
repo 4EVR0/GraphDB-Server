@@ -4,6 +4,7 @@ neo4j/data/
 neo4j/logs/
 neo4j/plugins/
 neo4j/import/
+pg_experiment/data/
 venv/
 __pycache__/
 *.pyc
