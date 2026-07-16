@@ -55,7 +55,16 @@ Neo4j의 property graph를 복사하는 게 아니라, 같은 개체·관계 모
     PK를 (inci_name, effect_code)로 걸면 이 행들이 유실되어 Postgres가
     실제보다 적은 데이터로 조인하게 됨 → `affects` PK를 BIGSERIAL로 변경,
     전체 행 유지 (schema.sql 수정, 커밋 2082434)
-- [ ] Cypher 쿼리 3종 → SQL 포팅
+- [x] Cypher 쿼리 3종 → SQL 포팅 (`queries.py`) + 결과 일치 검증 (`verify_parity.py`)
+  - 검증 중 발견한 이슈 1: Postgres DB collation(`en_US.utf8`)이 한글 문자열을
+    Neo4j(유니코드 코드포인트 기준)와 다르게 정렬 → `query_products_by_ingredients`에서
+    동점(matched_count 같음) 처리 시 top-5 상품 집합 자체가 완전히 달라짐.
+    `ORDER BY product_name COLLATE "C"`로 코드포인트 기준 정렬을 맞춰 해결.
+  - 검증 중 발견한 이슈 2: `query_path_by_effects`는 원본 Cypher가
+    `ORDER BY r.graph_score DESC` 하나만 쓰고 2차 정렬 기준이 없어서, 동점(같은
+    graph_score) 행이 많으면 LIMIT 10 안에 어느 행이 들지가 **원본 쿼리 자체가
+    이미 비결정적**. SQL 포팅 버그가 아니라 프로덕션 쿼리의 기존 특성이라
+    "고치지" 않고 그대로 반영, 검증도 신원이 아닌 graph_score 분포로만 비교.
 - [ ] 벤치마크 하네스 작성 (반복 실행, p50/p95/p99, hop 수 확장 시나리오)
 - [ ] 벤치마크 실행 및 결과 정리
 
