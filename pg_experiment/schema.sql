@@ -42,14 +42,17 @@ CREATE TABLE contains (
 );
 
 -- (Ingredient)-[:AFFECTS]->(Effect)
+-- Neo4j는 멀티그래프라 같은 (ingredient, effect) 쌍에 관계가 여러 개 있을 수 있음
+-- (실제로 affects.csv에 58쌍 중복 존재) -> PK를 (inci_name, effect_code)로 걸면
+-- 원본보다 적은 행을 갖게 되어 벤치마크가 불공정해짐. surrogate PK로 전체 행 유지.
 CREATE TABLE affects (
+    id            BIGSERIAL PRIMARY KEY,
     inci_name     TEXT NOT NULL REFERENCES ingredient(inci_name),
     effect_code   TEXT NOT NULL REFERENCES effect(effect_code),
     type          TEXT,
     evidence_type TEXT,
     graph_score   DOUBLE PRECISION,
-    paper_count   INT,
-    PRIMARY KEY (inci_name, effect_code)
+    paper_count   INT
 );
 
 -- (Effect)-[:RELATES_TO]->(Concern)
@@ -64,3 +67,4 @@ CREATE TABLE relates_to (
 CREATE INDEX idx_contains_inci_name  ON contains (inci_name);
 CREATE INDEX idx_product_category    ON product (category);
 CREATE INDEX idx_affects_effect_code ON affects (effect_code);
+CREATE INDEX idx_affects_inci_name   ON affects (inci_name);
