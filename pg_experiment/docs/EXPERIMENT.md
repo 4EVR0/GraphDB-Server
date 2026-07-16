@@ -94,5 +94,6 @@ pg_experiment/
     ├── RESULTS.md                  # 벤치마크 결과 + 결론
     ├── PROCESS.md                  # 시간순 진행 과정 서술
     ├── LLM_QUERY_GENERATION.md     # 후속 과제: LLM 가변 쿼리 생성 실행 계획
-    └── DISCUSSION_quality_vs_hop.md # 관련 논의 원문
+    ├── DISCUSSION_quality_vs_hop.md # 관련 논의 원문
+    └── DYNAMIC_QUERY_IMPLEMENTATION.md # 가변 쿼리 생성 구현 설계
 ```
