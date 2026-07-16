@@ -65,17 +65,36 @@ Neo4j의 property graph를 복사하는 게 아니라, 같은 개체·관계 모
     graph_score) 행이 많으면 LIMIT 10 안에 어느 행이 들지가 **원본 쿼리 자체가
     이미 비결정적**. SQL 포팅 버그가 아니라 프로덕션 쿼리의 기존 특성이라
     "고치지" 않고 그대로 반영, 검증도 신원이 아닌 graph_score 분포로만 비교.
-- [ ] 벤치마크 하네스 작성 (반복 실행, p50/p95/p99, hop 수 확장 시나리오)
-- [ ] 벤치마크 실행 및 결과 정리
+- [x] 벤치마크 하네스 작성 (반복 실행, p50/p95/p99, hop 수 확장 시나리오) — `benchmark.py`
+- [x] 벤치마크 실행 및 결과 정리 — 결과/해석/결론은 [`RESULTS.md`](./RESULTS.md),
+      전체 진행 과정 서술은 [`PROCESS.md`](./PROCESS.md) 참고
+- [x] 후속 과제 정리 — LLM이 쿼리를 직접 생성하는 구조로 갈 때 필요한 것은
+      [`LLM_QUERY_GENERATION.md`](./LLM_QUERY_GENERATION.md), 관련 논의는
+      [`DISCUSSION_quality_vs_hop.md`](./DISCUSSION_quality_vs_hop.md) 참고
 
 ## 파일 구성
 
+설명 문서(`*.md`)는 `docs/`에, 실행 스크립트/설정/결과 데이터는 `pg_experiment/`
+루트에 둔다.
+
 ```
 pg_experiment/
-├── EXPERIMENT.md      # 이 문서 — 과정 기록
-├── docker-compose.yml # 벤치마크 전용 Postgres 컨테이너 (5433 포트)
-├── schema.sql          # RDB 스키마
-├── load_csv.py          # (예정) CSV -> Postgres 적재
-├── queries_sql.py       # (예정) Cypher 3종의 SQL 버전
-└── benchmark.py          # (예정) Neo4j vs Postgres latency 비교
+├── docker-compose.yml     # 벤치마크 전용 Postgres 컨테이너 (5433 포트)
+├── schema.sql             # RDB 스키마
+├── load_csv.py            # CSV -> Postgres 적재
+├── queries.py             # Cypher 원본 + 포팅한 SQL
+├── verify_parity.py       # Cypher/SQL 결과 일치 검증
+├── benchmark.py           # Neo4j vs Postgres latency 벤치마크
+├── dump_full_results.py   # 쿼리별 전체 원본 결과 덤프
+├── results/
+│   ├── latencies.json     # 벤치마크 원본 수치
+│   └── full_query_dump.md # 쿼리별 전체 원본 결과
+└── docs/
+    ├── EXPERIMENT.md               # 이 문서 — 설계 논의/진행 단계
+    ├── RESULTS.md                  # 벤치마크 결과 + 결론
+    ├── PROCESS.md                  # 시간순 진행 과정 서술
+    ├── LLM_QUERY_GENERATION.md     # 후속 과제: LLM 가변 쿼리 생성 실행 계획
+    ├── DISCUSSION_quality_vs_hop.md # 관련 논의 원문
+    ├── AB_BD_EXECUTION_PLAN.md     # A vs B, B vs D 실험을 실제로 어떻게 돌릴지
+    └── DYNAMIC_QUERY_IMPLEMENTATION.md # (실험 이후) 프로덕션 구현 설계
 ```
