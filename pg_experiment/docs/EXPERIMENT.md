@@ -95,5 +95,6 @@ pg_experiment/
     ├── PROCESS.md                  # 시간순 진행 과정 서술
     ├── LLM_QUERY_GENERATION.md     # 후속 과제: LLM 가변 쿼리 생성 실행 계획
     ├── DISCUSSION_quality_vs_hop.md # 관련 논의 원문
-    └── DYNAMIC_QUERY_IMPLEMENTATION.md # 가변 쿼리 생성 구현 설계
+    ├── AB_BD_EXECUTION_PLAN.md     # A vs B, B vs D 실험을 실제로 어떻게 돌릴지
+    └── DYNAMIC_QUERY_IMPLEMENTATION.md # (실험 이후) 프로덕션 구현 설계
 ```
