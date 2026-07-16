@@ -153,7 +153,52 @@ A vs B와 B vs D 둘 다 품질 축이므로, 결론은 단순하게 정리된�
   D가 이기면 엔진 전환까지 고려 대상이 된다(단 이 경우 hop 분포를 봐서
   §5-2의 hop-scaling 곡선상 실행 비용이 감당 가능한 수준인지 같이 확인).
 
-## 7. 리스크/주의점
+## 7. 실제 착수 시 실행 순서
+
+§4/§5/§6을 실제로 실행하려면 뭘 새로 만들고 뭘 그대로 재사용할지 정리.
+
+### 이미 있어서 그대로 쓰면 되는 것
+
+- `eval/gold_labels.py`: 26개 concern → effect 정답 매핑
+  (`PRODUCTION_CONCERN_EFFECT_MAP`), 그래프에서 gold 성분/제품을 뽑는 함수까지
+  이미 있음.
+- `eval/graphrag_ranking_eval.py`: Precision@K, NDCG@K 채점 로직 이미 있음 —
+  `eval/RESULTS.md`에 쓰인 방법론 그대로. "품질을 어떻게 채점할지"는 새로 만들
+  필요 없다.
+
+### 공통으로 한 번만 만들면 되는 것
+
+- **자연어 질문 세트**: concern 26개 중 hop별로 대표 질문을 뽑아서 기존 gold
+  label과 바로 매칭되게 구성 (`gold_labels.py`의 concern 코드를 그대로 키로 씀).
+
+### A vs B에 필요한 것
+
+- A(고정)는 이미 있음 — `neo4j_client.py`/`pg_experiment/queries.py`의 `CYPHER_*`
+  그대로.
+- B(가변)는 신규 — `DYNAMIC_QUERY_IMPLEMENTATION.md` §2/§3의
+  `cypher_generation.txt` 프롬프트 + `generate_query()` 함수. **오프라인 평가
+  단계라 §4의 read-only 계정/LIMIT 강제까지는 필요 없고, EXPLAIN 검증 정도만
+  있으면 됨** (운영 DB에 붙는 게 아니므로 가드레일을 최소화해도 안전).
+- A 결과·B 결과를 각각 `graphrag_ranking_eval.py` 채점 로직에 넣어서 비교.
+
+### B vs D에 필요한 것
+
+- B는 위에서 이미 확보.
+- D(가변, RDB)는 신규 — `sql_generation.txt` 프롬프트 + Postgres용 생성/실행
+  경로 (`pg_experiment`의 Postgres 그대로 재사용).
+- B·D 결과를 같은 gold label로 채점해서 비교.
+
+### 실행 순서
+
+**A vs B부터 먼저 한다.** Cypher 생성 파이프라인만 있으면 되고 RDB 쪽은 아직
+안 건드려도 된다.
+
+- A vs B에서 가변이 품질을 뚜렷이 올리지 **못하면** → 여기서 멈춘다. D 쪽
+  (SQL 생성 파이프라인)은 아예 만들 필요가 없다 — 리소스 낭비 방지.
+- A vs B에서 가변이 품질을 **올린다면** → 그때만 SQL 생성 파이프라인을 추가로
+  만들어서 B vs D로 넘어간다.
+
+## 8. 리스크/주의점
 
 - **모델 의존성**: 이 프로젝트가 실제로 쓰는 모델(`GPU_SERVER_URL`, Qwen3.5-9B)로
   테스트해야 의미가 있다. 범용 대형 모델(GPT-4급 등)로 테스트하면 실제 프로덕션과
@@ -167,7 +212,7 @@ A vs B와 B vs D 둘 다 품질 축이므로, 결론은 단순하게 정리된�
   변수라 의도적으로 제외"했지만, 이 실험에서는 오히려 **LLM의 쿼리 생성 시간
   자체가 핵심 측정 대상**이 된다 — 목적이 다르므로 방법론도 반대로 가져가야 함.
 
-## 8. 진행 여부
+## 9. 진행 여부
 
 계획 단계 문서. 실제 구현(질문 세트 작성, 생성/채점 파이프라인 스크립트 등)은
 착수 전 확인 후 진행.
