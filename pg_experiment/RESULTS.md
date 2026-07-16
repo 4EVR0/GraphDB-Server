@@ -262,6 +262,20 @@ verify_parity.py/benchmark.py는 신원(id) 또는 latency 숫자만 비교했�
   "성분 표기가 달라 매칭이 안 되는" 커버리지 부족 문제를 풀려면 이쪽 실험이 이어서 필요.
 - **동시 부하(동시성) 상황의 처리량**: 이번 벤치마크는 순차 실행 latency만 측정, 동시
   요청 시 커넥션 풀 경합 등은 안 봄.
+- **"LLM이 쿼리를 직접 생성하기 쉬운가" (text-to-Cypher vs text-to-SQL)**: 확인해보니
+  지금 4EVR0-Server는 LLM이 Cypher를 직접 안 쓴다 — `recommend_service.py`가
+  `neo4j_client.py`의 고정 파라미터화 템플릿을 호출할 뿐이고, LLM은 자연어를
+  `effect_names`/`ingredient_names` 같은 구조화된 파라미터로 추출하는 역할만 한다
+  (text-to-parameter + 고정 템플릿, text-to-query 아님). 그래서 "Cypher가 LLM이
+  쓰기 쉽다"는 그래프DB의 장점은 지금 아키텍처에서는 발동하지 않는다. 이 장점을
+  검증하려면 실제로 LLM이 자연어 질문에서 Cypher/SQL을 직접 생성하는 구조로 바꾼
+  뒤 생성 성공률/문법 정확도를 재는 별도 실험이 필요 — 이번 latency 벤치마크와는
+  성격이 다른 실험.
+- **그래프 구조가 추천 품질 자체에 미치는 영향**: `eval/RESULTS.md`에 이미 GraphRAG
+  경로 탐색 vs 빈도 베이스라인의 Precision/Recall/NDCG 평가가 있어 부분적으로는
+  다뤄진 주제. 다만 RDB로 옮겼을 때 같은 방식(경로 탐색 기반 추천)이 동일한 품질로
+  재현되는지는 별도 확인이 필요 — latency 비교와 무관한 품질 축이라 이번 실험
+  범위에는 포함하지 않음.
 
 ## 8. 결론
 
