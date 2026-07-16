@@ -156,3 +156,28 @@ WHERE a.effect_code = ANY(%(effects)s)
 ORDER BY a.graph_score DESC
 LIMIT 10
 """
+
+
+# ── 4. query_products_by_concern (프로덕션 미사용, hop-scaling 비교용) ──────
+# README에 문서화된 전체 경로 Product-CONTAINS->Ingredient-AFFECTS->Effect-RELATES_TO->Concern.
+# 3개 프로덕션 쿼리는 전부 1~2-hop인데, 이 쿼리는 4-hop이라 "hop 수가 늘어나면
+# 그래프DB가 유리해지는 지점이 있는가"를 보려고 추가함. 실서비스에서는 안 씀
+# (eval/RESULTS.md: 4EVR0-Server는 RELATES_TO 대신 하드코딩된 CONCERN_EFFECT_MAP을 씀).
+
+CYPHER_PRODUCTS_BY_CONCERN = """
+MATCH (prod:Product)-[:CONTAINS]->(i:Ingredient)-[:AFFECTS]->(e:Effect)-[:RELATES_TO]->(c:Concern {concern_code: $concern_code})
+RETURN DISTINCT prod.product_id AS product_id, prod.product_name AS product_name
+LIMIT 10
+"""
+
+SQL_PRODUCTS_BY_CONCERN = """
+SELECT DISTINCT p.product_id AS product_id, p.product_name AS product_name
+FROM contains c
+JOIN product p     ON p.product_id = c.product_id
+JOIN ingredient i  ON i.inci_name = c.inci_name
+JOIN affects a     ON a.inci_name = i.inci_name
+JOIN effect e      ON e.effect_code = a.effect_code
+JOIN relates_to rt ON rt.effect_code = e.effect_code
+WHERE rt.concern_code = %(concern_code)s
+LIMIT 10
+"""
