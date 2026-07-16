@@ -206,7 +206,7 @@ verify_parity.py/benchmark.py는 신원(id) 또는 latency 숫자만 비교했�
 10. product_id=UUID('01502317-68eb-5c24-9307-8d85eb67c3de'), product_name='나인위시스 pH 캄 시카 토너패드'
 ```
 
-전체 스크립트: [`dump_full_results.py`](./dump_full_results.py), 원본 파일: [`results/full_query_dump.md`](./results/full_query_dump.md)
+전체 스크립트: [`dump_full_results.py`](../dump_full_results.py), 원본 파일: [`results/full_query_dump.md`](../results/full_query_dump.md)
 
 ## 4. 벤치마크 원본 출력 (`benchmark.py`)
 
@@ -227,7 +227,7 @@ verify_parity.py/benchmark.py는 신원(id) 또는 latency 숫자만 비교했�
 결과 저장: pg_experiment/results/latencies.json
 ```
 
-원본 JSON: [`results/latencies.json`](./results/latencies.json)
+원본 JSON: [`results/latencies.json`](../results/latencies.json)
 
 ## 5. 요약 표 (hop 수 순)
 
