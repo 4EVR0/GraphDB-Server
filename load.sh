@@ -136,4 +136,4 @@ echo "=== Import 완료! Neo4j 재시작 ==="
 docker compose -f /home/graphdb/docker-compose.yml up -d
 echo ""
 echo "브라우저: http://localhost:7474"
-echo "ID: neo4j / PW: graphdb1234"
+echo "인증 정보는 서버의 .env에서 관리합니다. 로그에 비밀번호를 출력하지 않습니다."
