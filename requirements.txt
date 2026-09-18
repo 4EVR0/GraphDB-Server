@@ -1,0 +1,4 @@
+# migrate.py + eval/ 실행에 필요한 패키지
+neo4j>=5.20
+pandas>=2.0
+PyYAML>=6.0

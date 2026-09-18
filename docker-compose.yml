@@ -1,6 +1,7 @@
 services:
   neo4j:
-    image: neo4j:5
+    # 5.26 LTS 핀 고정 — 재현 가능한 임포트 + 벡터 인덱스(5.13+) 지원 (Phase 2 대비)
+    image: neo4j:5.26
     container_name: neo4j
     ports:
       - "7474:7474"   # Browser
@@ -16,6 +17,7 @@ services:
       - ./neo4j/logs:/logs
       - ./neo4j/import:/var/lib/neo4j/import
       - ./neo4j/plugins:/plugins
+      - ./migrations:/migrations:ro   # cypher-shell -f /migrations/... 수동 디버깅용
     restart: unless-stopped
 
   promtail:

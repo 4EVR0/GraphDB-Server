@@ -26,7 +26,7 @@ latest_prefix() {
   aws s3 ls "$base/" | awk '{print $2}' | grep -E "^${pattern}" | sed 's#/$##' | sort | tail -n1
 }
 
-echo "=== [0/5] 적재 대상 배치 결정 ==="
+echo "=== [0/7] 적재 대상 배치 결정 ==="
 
 if [ -z "$BATCH_JOB" ]; then
   BATCH_JOB=$(latest_prefix "$S3_GOLD_BASE" "batch_job=")
@@ -62,7 +62,7 @@ echo "  S3_PRODUCT_DIR=$S3_PRODUCT_DIR"
 echo "  S3_CONTAINS_DIR=$S3_CONTAINS_DIR"
 echo ""
 
-echo "=== [1/5] S3에서 CSV 다운로드 ==="
+echo "=== [1/7] S3에서 CSV 다운로드 ==="
 
 # batch 경로에서 ingredient, effect, concern, affects, relates_to 받기
 # product, contains는 별도 경로에서 받으므로 제외
@@ -87,11 +87,11 @@ echo "다운로드 완료:"
 find "$CSV_DIR" -name "*.csv" | sort
 
 echo ""
-echo "=== [2/5] ID 검증 ==="
+echo "=== [2/7] ID 검증 ==="
 python3 /home/graphdb/validate.py /home/graphdb/csv
 echo ""
 
-echo "=== [3/5] 적재 대상 카운트 (헤더 제외) ==="
+echo "=== [3/7] 적재 대상 카운트 (헤더 제외) ==="
 for f in "$CSV_DIR"/nodes/*.csv; do
   [ -e "$f" ] || continue
   n=$(($(wc -l < "$f") - 1))
@@ -104,22 +104,24 @@ for f in "$CSV_DIR"/edges/*.csv; do
 done
 echo ""
 
-echo "=== [4/5] import 디렉토리로 복사 ==="
+echo "=== [4/7] import 디렉토리로 복사 ==="
 sudo chown -R jiwoo:jiwoo "$IMPORT_DIR"
 cp -r "$CSV_DIR"/* "$IMPORT_DIR/"
 echo "복사 완료"
 
 echo ""
-echo "=== [5/5] neo4j-admin bulk import ==="
+echo "=== [5/7] neo4j-admin bulk import ==="
 if docker ps -q -f name=neo4j | grep -q .; then
   echo "Neo4j 컨테이너 중지 중..."
   docker stop neo4j
 fi
 
+# RELATES_TO(concern↔effect taxonomy)는 벌크 임포트에서 제외 —
+# migrations/V002가 taxonomy.yaml 기준으로 전량 재구축한다 (단일 소스).
 docker run --rm \
   -v /home/graphdb/neo4j/data:/data \
   -v /home/graphdb/neo4j/import:/var/lib/neo4j/import \
-  neo4j:5 \
+  neo4j:5.26 \
   neo4j-admin database import full \
     --nodes=Product=/var/lib/neo4j/import/nodes/product.csv \
     --nodes=Ingredient=/var/lib/neo4j/import/nodes/ingredient.csv \
@@ -127,13 +129,22 @@ docker run --rm \
     --nodes=Concern=/var/lib/neo4j/import/nodes/concern.csv \
     --relationships=CONTAINS=/var/lib/neo4j/import/edges/contains.csv \
     --relationships=AFFECTS=/var/lib/neo4j/import/edges/affects.csv \
-    --relationships=RELATES_TO=/var/lib/neo4j/import/edges/relates_to.csv \
     --overwrite-destination \
     neo4j
 
 echo ""
-echo "=== Import 완료! Neo4j 재시작 ==="
+echo "=== [6/7] Neo4j 재시작 ==="
 docker compose -f /home/graphdb/docker-compose.yml up -d
+
+echo ""
+echo "=== [7/7] 스키마 마이그레이션 (constraints/인덱스/taxonomy) ==="
+# migrate.py는 python3 + neo4j 드라이버 필요 (pip install -r requirements.txt).
+# NEO4J_PASSWORD 등 접속 정보는 docker-compose와 같은 .env에서 가져온다.
+set -a
+. /home/graphdb/.env
+set +a
+python3 /home/graphdb/migrate.py --wait 180 --verify
+
 echo ""
 echo "브라우저: http://localhost:7474"
 echo "인증 정보는 서버의 .env에서 관리합니다. 로그에 비밀번호를 출력하지 않습니다."
