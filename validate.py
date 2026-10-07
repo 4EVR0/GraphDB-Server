@@ -74,6 +74,15 @@ def main(root: Path) -> None:
             concerns,
         ),
     }
+    # 고민별 논문 근거(GraphRAG_Pipeline #49). --review-dir로 빌드한 배치에만 있다.
+    if (edges / "evidence_for.csv").exists():
+        counts["EVIDENCE_FOR"] = validate_relationship(
+            edges / "evidence_for.csv",
+            ":START_ID(Ingredient)",
+            ingredients,
+            ":END_ID(Concern)",
+            concerns,
+        )
     print(
         "[OK] "
         f"nodes={len(products) + len(ingredients) + len(effects) + len(concerns)} "

@@ -64,8 +64,11 @@ echo ""
 
 echo "=== [1/5] S3에서 CSV 다운로드 ==="
 
-# batch 경로에서 ingredient, effect, concern, affects, relates_to 받기
+# batch 경로에서 ingredient, effect, concern, affects, relates_to(+ 있으면 evidence_for) 받기
 # product, contains는 별도 경로에서 받으므로 제외
+# evidence_for.csv(고민별 논문 근거, GraphRAG_Pipeline #49)는 --review-dir로 빌드한 배치에만 있다.
+# sync는 로컬 파일을 지우지 않으므로, 이전 배치의 파일이 남아 섞이지 않게 먼저 지운다.
+rm -f "$CSV_DIR/edges/evidence_for.csv"
 aws s3 sync "$S3_BATCH/nodes/" "$CSV_DIR/nodes/" \
   --exclude "product.csv"
 aws s3 sync "$S3_BATCH/edges/" "$CSV_DIR/edges/" \
@@ -106,6 +109,8 @@ echo ""
 
 echo "=== [4/5] import 디렉토리로 복사 ==="
 sudo chown -R jiwoo:jiwoo "$IMPORT_DIR"
+# 이전 적재의 evidence_for.csv가 import 디렉토리에 남아 섞이지 않게 한다.
+rm -f "$IMPORT_DIR/edges/evidence_for.csv"
 cp -r "$CSV_DIR"/* "$IMPORT_DIR/"
 echo "복사 완료"
 
@@ -114,6 +119,14 @@ echo "=== [5/5] neo4j-admin bulk import ==="
 if docker ps -q -f name=neo4j | grep -q .; then
   echo "Neo4j 컨테이너 중지 중..."
   docker stop neo4j
+fi
+
+EXTRA_RELS=()
+if [ -f "$IMPORT_DIR/edges/evidence_for.csv" ]; then
+  EXTRA_RELS+=(--relationships=EVIDENCE_FOR=/var/lib/neo4j/import/edges/evidence_for.csv)
+  echo "EVIDENCE_FOR 포함"
+else
+  echo "EVIDENCE_FOR 없음(이 배치는 고민별 논문 근거 없이 빌드됨)"
 fi
 
 docker run --rm \
@@ -128,6 +141,7 @@ docker run --rm \
     --relationships=CONTAINS=/var/lib/neo4j/import/edges/contains.csv \
     --relationships=AFFECTS=/var/lib/neo4j/import/edges/affects.csv \
     --relationships=RELATES_TO=/var/lib/neo4j/import/edges/relates_to.csv \
+    ${EXTRA_RELS[@]+"${EXTRA_RELS[@]}"} \
     --overwrite-destination \
     neo4j
 
@@ -137,3 +151,8 @@ docker compose -f /home/graphdb/docker-compose.yml up -d
 echo ""
 echo "브라우저: http://localhost:7474"
 echo "인증 정보는 서버의 .env에서 관리합니다. 로그에 비밀번호를 출력하지 않습니다."
+echo ""
+echo "벌크 임포트는 그래프를 덮어쓴다. 기동 후 추가 적재를 다시 실행할 것:"
+echo "  (GraphRAG_Pipeline) python scripts/load_caution_to_neo4j.py   # CAUTION 엣지"
+echo "  (INCI_Pipeline) python -m pipeline.mfds_regulation.load_neo4j   # 국내 규제 상태"
+echo "  (INCI_Pipeline) python -m pipeline.reference_book.load_neo4j --s3-latest   # 참고 도서 근거"
